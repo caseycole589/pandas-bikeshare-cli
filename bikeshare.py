@@ -28,12 +28,13 @@ def get_filters():
           'august', 'september', 'october', 'november', 'december']
     while not month in month_list:
         month = input("Please select a month all, january, february, ... , june\n")
-        
+    if month != 'all':
+        month = month_list.index(month)
     # TO DO: get user input for day of week (all, monday, tuesday, ... sunday)
     days_in_week = ['all', 'monday','sunday','tuesday','wednesday','thursday', 'friday', 'saturday']
     while day not in days_in_week:
         day = input("Please select a day of the week all, monday, tuesday, ... sunday\n")
-    print(city,month,day)
+    
     print('-'*40)
     return city, month, day
 
@@ -49,8 +50,17 @@ def load_data(city, month, day):
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
-
-
+    df = pd.read_csv(CITY_DATA[city])
+    df['Start Time'] = pd.to_datetime(df['Start Time']) 
+    df['month'] = df['Start Time'].dt.month
+    df['day_of_week'] = df['Start Time'].dt.weekday_name
+    
+    if month != 'all': 
+        df = df.query('month == 1'.format(month))
+   
+    if day != 'all':
+        df = df.query('day_of_week == "{}"'.format(day.title()))
+    print(df.head())
     return df
 
 
@@ -129,8 +139,9 @@ def user_stats(df):
 
 def main():
 #     while True:
-      city, month, day = get_filters()
-#         df = load_data(city, month, day)
+    # city, month, day = get_filters()
+    # df = load_data(city, month, day)
+    df = load_data('chicago', 1, 'monday')
 
 #         time_stats(df)
 #         station_stats(df)
